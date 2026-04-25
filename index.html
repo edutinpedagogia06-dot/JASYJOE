@@ -383,8 +383,8 @@ function renderGrid() {
     return;
   }
   g.className = 'pgrid';
-  g.innerHTML = products.map(p => `
-    <div class="pcard" onclick="openModal('${p.id}')">
+  g.innerHTML = products.map((p,idx) => `
+    <div class="pcard" onclick="openModalIdx(${idx})">
       <div class="pimg"><img src="${p.img}" alt="${p.name}"><div class="poverlay"><button class="qadd">Ver detalles</button></div></div>
       <div class="pinfo">
         <div class="pname">${p.name}</div><div class="ptype">${p.type}</div>
@@ -393,10 +393,10 @@ function renderGrid() {
     </div>`).join('');
 }
 
-function openModal(id) {
-  const p = products.find(x => x.id === id);
+function openModalIdx(idx) {
+  const p = products[idx];
   if (!p) return;
-  curProd = id; selSize = null; selType = 'Detal';
+  curProd = idx; selSize = null; selType = 'Detal';
   document.getElementById('mImg').src = p.img;
   document.getElementById('mName').textContent = p.name;
   document.getElementById('mPDetal').textContent = fmt(p.priceDetal) + ' · Detal';
@@ -414,10 +414,11 @@ function selS(btn) { document.querySelectorAll('#mSizes .mchip').forEach(b=>b.cl
 function selT(btn) { document.querySelectorAll('#mTypes .mchip').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); selType = btn.dataset.t; }
 
 function addToCart() {
-  if (!selSize || !curProd) return;
-  const p = products.find(x=>x.id===curProd);
+  if (!selSize || curProd === null) return;
+  const p = products[curProd];
+  if (!p) return;
   const price = selType === 'Mayor' ? p.priceMayor : p.priceDetal;
-  cart.push({ id:curProd, name:p.name, type:p.type, size:selSize, purchaseType:selType, price, img:p.img });
+  cart.push({ id:p.id, name:p.name, type:p.type, size:selSize, purchaseType:selType, price, img:p.img });
   renderCart(); closeModal(); toggleCart();
 }
 function removeFromCart(i) { cart.splice(i,1); renderCart(); }
@@ -526,13 +527,13 @@ function logoutAdmin() {
 function renderAdminList() {
   const list = document.getElementById('admList');
   if (!products.length) { list.innerHTML = '<p style="font-size:.75rem;color:var(--gray)">No hay productos aún.</p>'; return; }
-  list.innerHTML = products.map(p => `<div class="adm-item"><img src="${p.img}" alt="${p.name}"><div class="adm-item-info"><div class="adm-item-name">${p.name}</div><div class="adm-item-sub">${p.type} · Detal ${fmt(p.priceDetal)} · Mayor ${fmt(p.priceMayor)}</div></div><div class="adm-item-btns"><button class="abtn" onclick="startEdit('${p.id}')">Editar</button><button class="abtn danger" onclick="deleteProduct('${p.id}')">Eliminar</button></div></div>`).join('');
+  list.innerHTML = products.map((p,idx) => `<div class="adm-item"><img src="${p.img}" alt="${p.name}"><div class="adm-item-info"><div class="adm-item-name">${p.name}</div><div class="adm-item-sub">${p.type} · Detal ${fmt(p.priceDetal)} · Mayor ${fmt(p.priceMayor)}</div></div><div class="adm-item-btns"><button class="abtn" onclick="startEditIdx(${idx})">Editar</button><button class="abtn danger" onclick="deleteProductIdx(${idx})">Eliminar</button></div></div>`).join('');
 }
 
-function startEdit(id) {
-  const p = products.find(x=>x.id===id);
+function startEditIdx(idx) {
+  const p = products[idx];
   if (!p) return;
-  editingId = id; newImgB64 = null;
+  editingId = p.id; newImgB64 = null;
   document.getElementById('fName').value = p.name;
   document.getElementById('fType').value = p.type;
   document.getElementById('fDetal').value = p.priceDetal;
@@ -600,11 +601,14 @@ function saveProduct() {
   showStatus('Cambios guardados. Recuerda presionar "Publicar" para que aparezcan en la tienda.', '');
 }
 
-function deleteProduct(id) {
-  if (!confirm('¿Eliminar este producto del catálogo?')) return;
-  products = products.filter(x=>x.id!==id);
+function deleteProductIdx(idx) {
+  const p = products[idx];
+  if (!p) return;
+  if (!confirm('¿Eliminar "' + p.name + '" del catálogo?')) return;
+  products.splice(idx, 1);
   markDirty();
   renderGrid(); renderAdminList();
+  showStatus('Producto eliminado. Presiona "Publicar" para aplicar los cambios.', '');
 }
 
 function markDirty() {
@@ -653,7 +657,14 @@ async function publishChanges() {
     }
 
     const jsonStr = JSON.stringify(products);
-    const contentB64 = btoa(unescape(encodeURIComponent(jsonStr)));
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(jsonStr);
+    let binary = '';
+    const chunk = 8192;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode.apply(null, bytes.slice(i, i + chunk));
+    }
+    const contentB64 = btoa(binary);
 
     const body = {
       message: 'Actualizar catálogo · ' + new Date().toLocaleString('es-CO'),
