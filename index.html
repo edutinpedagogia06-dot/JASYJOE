@@ -423,22 +423,69 @@ function fmt(n) { return '$' + Number(n).toLocaleString('es-CO'); }
 
 // ── LOAD DATA ────────────────────────────────────────────────────────────────
 async function loadData() {
-  const url = `https://raw.githubusercontent.com/${CFG.githubUser}/${CFG.githubRepo}/${CFG.githubBranch}/${CFG.dataPath}?t=${Date.now()}`;
+  const base = `https://raw.githubusercontent.com/${CFG.githubUser}/${CFG.githubRepo}/${CFG.githubBranch}/`;
+  const t = '?t=' + Date.now();
+
+  // Try loading store.json first (new format)
+  let hasStore = false;
   try {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('not found');
-    storeData = await r.json();
-    // migrate: if old format (array = products only), wrap it
-    if (Array.isArray(storeData)) {
-      storeData = { site: JSON.parse(JSON.stringify(DEFAULT_SITE)), collections: [{ id:'col_migrated', name:'Colección', products: storeData }] };
+    const r = await fetch(base + 'store.json' + t);
+    if (r.ok) {
+      storeData = await r.json();
+      if (Array.isArray(storeData)) {
+        storeData = { site: JSON.parse(JSON.stringify(DEFAULT_SITE)), collections: [{ id:'col_migrated', name:'Colección', products: storeData }] };
+      }
+      if (!storeData.site) storeData.site = JSON.parse(JSON.stringify(DEFAULT_SITE));
+      if (!storeData.collections) storeData.collections = [];
+      hasStore = true;
     }
-    if (!storeData.site) storeData.site = JSON.parse(JSON.stringify(DEFAULT_SITE));
-    if (!storeData.collections) storeData.collections = [];
-    serverData = JSON.parse(JSON.stringify(storeData));
-  } catch(e) {
-    storeData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    serverData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  } catch(e) {}
+
+  // Also try loading old products.json
+  let oldProducts = [];
+  try {
+    const r2 = await fetch(base + 'products.json' + t);
+    if (r2.ok) oldProducts = await r2.json();
+  } catch(e) {}
+
+  // Also try loading old site.json
+  try {
+    const r3 = await fetch(base + 'site.json' + t);
+    if (r3.ok) {
+      const oldSite = await r3.json();
+      // If store.json doesn't have site config or it's default, use old site.json
+      if (!hasStore || !storeData.site || !storeData.site.notice) {
+        storeData.site = oldSite;
+      }
+    }
+  } catch(e) {}
+
+  if (!hasStore) {
+    // No store.json exists yet — build from old files
+    storeData = {
+      site: storeData.site || JSON.parse(JSON.stringify(DEFAULT_SITE)),
+      collections: []
+    };
   }
+
+  // Merge old products into first collection if they exist and aren't already there
+  if (oldProducts.length > 0) {
+    const existingIds = new Set();
+    (storeData.collections || []).forEach(c => (c.products||[]).forEach(p => existingIds.add(p.id)));
+    const newProds = oldProducts.filter(p => !existingIds.has(p.id));
+    if (newProds.length > 0) {
+      if (!storeData.collections.length) {
+        storeData.collections.push({ id:'col_legacy', name:'Colección Principal', products: [] });
+      }
+      storeData.collections[0].products = [...(storeData.collections[0].products||[]), ...newProds];
+    }
+  }
+
+  if (!storeData.collections.length) {
+    storeData.collections.push({ id:'col_default', name:'Colección', products: [] });
+  }
+
+  serverData = JSON.parse(JSON.stringify(storeData));
   applySiteConfig();
   if (storeData.collections.length) activeColId = storeData.collections[0].id;
   renderTabs();
