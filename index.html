@@ -41,6 +41,14 @@ nav{position:fixed;top:34px;left:0;right:0;z-index:200;display:flex;align-items:
 .cat-header h2{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:300}
 
 /* TABS */
+.search-wrap{max-width:400px;margin:0 auto 2rem;padding:0 2rem;position:relative}
+.search-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--white);padding:.7rem 1rem .7rem 2.6rem;font-family:'Raleway',sans-serif;font-size:.78rem;letter-spacing:.05em;outline:none;transition:border-color .3s}
+.search-input:focus{border-color:var(--pink)}
+.search-input::placeholder{color:var(--gray);letter-spacing:.1em}
+.search-icon{position:absolute;left:calc(2rem + 10px);top:50%;transform:translateY(-50%);width:15px;height:15px;opacity:.4;pointer-events:none}
+.search-clear{position:absolute;right:calc(2rem + 10px);top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray);font-size:1rem;cursor:pointer;display:none;padding:0 4px}
+.search-clear.on{display:block}
+.search-clear:hover{color:var(--white)}
 .tabs{display:flex;justify-content:center;gap:.3rem;margin:0 auto 3rem;padding:0 2rem;flex-wrap:wrap;max-width:800px}
 .tab{background:none;border:1px solid rgba(255,255,255,.12);color:var(--gray-light);padding:.6rem 1.5rem;font-family:'Raleway',sans-serif;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .3s}
 .tab:hover{border-color:var(--pink);color:var(--pink)}
@@ -239,6 +247,11 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
   <div class="cat-header">
     <div class="section-label">Prendas disponibles</div>
     <h2>Nuestras Colecciones</h2>
+  </div>
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" class="search-input" id="searchInput" placeholder="Buscar producto..." oninput="handleSearch()">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="pgrid"><div class="loading-cat">Cargando catálogo…</div></div>
@@ -952,6 +965,53 @@ async function publishChanges() {
     showStatus('Error: ' + e.message, 'error');
     document.getElementById('publishBtn').disabled = false;
   }
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+function handleSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  document.getElementById('searchClear').classList.toggle('on', q.length > 0);
+  if (q.length === 0) { renderGrid(); return; }
+  // Search across ALL collections
+  let results = [];
+  (storeData.collections || []).forEach(col => {
+    (col.products || []).forEach((p, idx) => {
+      if (p.name.toLowerCase().includes(q) || p.type.toLowerCase().includes(q)) {
+        results.push({ ...p, colId: col.id, colName: col.name, idx });
+      }
+    });
+  });
+  renderSearchResults(results);
+}
+
+function renderSearchResults(results) {
+  const g = document.getElementById('pgrid');
+  if (!results.length) {
+    g.innerHTML = `<div class="empty-cat" style="grid-column:1/-1"><p>No se encontraron productos</p></div>`;
+    g.className = '';
+    return;
+  }
+  g.className = 'pgrid';
+  g.innerHTML = results.map(p => `
+    <div class="pcard" onclick="openSearchResult('${p.colId}',${p.idx})">
+      <div class="pimg"><img src="${p.img}" alt="${p.name}"><div class="poverlay"><button class="qadd">Ver detalles</button></div></div>
+      <div class="pinfo">
+        <div class="pname">${p.name}</div><div class="ptype">${p.type} · ${p.colName}</div>
+        <div class="pprices"><span class="pdetal">${fmt(p.priceDetal)}</span><span class="pmayor">Mayor ${fmt(p.priceMayor)}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function openSearchResult(colId, idx) {
+  activeColId = colId;
+  renderTabs();
+  openModal(idx);
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('on');
+  renderGrid();
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
