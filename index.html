@@ -3,7 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JASY — Tienda</title>
+<title>JASY — Ropa Femenina en Barranquilla | Bodys, Blusas y Camisetas</title>
+<meta name="description" content="JASY Boutique — Tienda de ropa femenina en Barranquilla, Colombia. Bodys, blusas, camisetas y más. Moda consciente hecha en Colombia. Envíos a todo el país. Compra por WhatsApp.">
+<meta name="keywords" content="JASY, Jasy boutique, ropa femenina Barranquilla, bodys Colombia, blusas mujer, camisetas mujer, moda colombiana, tienda ropa mujer, ropa femenina Colombia, moda consciente">
+<meta name="author" content="JASY Boutique">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://jasy.vercel.app/">
+
+<!-- Open Graph (Facebook, Instagram, WhatsApp) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="JASY — Ropa Femenina en Barranquilla">
+<meta property="og:description" content="Bodys, blusas, camisetas y más. Moda consciente hecha en Colombia. Envíos a todo el país.">
+<meta property="og:url" content="https://jasy.vercel.app/">
+<meta property="og:site_name" content="JASY Boutique">
+<meta property="og:image" content="https://raw.githubusercontent.com/edutinpedagogia06-dot/JASYJOE/main/logojasy.png">
+<meta property="og:locale" content="es_CO">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="JASY — Ropa Femenina en Barranquilla">
+<meta name="twitter:description" content="Bodys, blusas, camisetas y más. Moda consciente hecha en Colombia.">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/edutinpedagogia06-dot/JASYJOE/main/logojasy.png">
+
+<!-- Structured Data (Google) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ClothingStore",
+  "name": "JASY Boutique",
+  "description": "Tienda de ropa femenina en Barranquilla, Colombia. Bodys, blusas, camisetas y más. Moda consciente hecha en Colombia.",
+  "url": "https://jasy.vercel.app/",
+  "logo": "https://raw.githubusercontent.com/edutinpedagogia06-dot/JASYJOE/main/logojasy.png",
+  "telephone": "+573042634755",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Barranquilla",
+    "addressRegion": "Atlántico",
+    "addressCountry": "CO"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 10.9685,
+    "longitude": -74.7813
+  },
+  "priceRange": "$$",
+  "paymentAccepted": "Nequi, Daviplata, Tarjetas de crédito y débito",
+  "areaServed": "Colombia",
+  "sameAs": [
+    "https://wa.me/573042634755"
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
@@ -41,14 +91,17 @@ nav{position:fixed;top:34px;left:0;right:0;z-index:200;display:flex;align-items:
 .cat-header h2{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:300}
 
 /* TABS */
-.search-wrap{max-width:400px;margin:0 auto 2rem;padding:0 2rem;position:relative}
-.search-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--white);padding:.7rem 1rem .7rem 2.6rem;font-family:'Raleway',sans-serif;font-size:.78rem;letter-spacing:.05em;outline:none;transition:border-color .3s}
-.search-input:focus{border-color:var(--pink)}
-.search-input::placeholder{color:var(--gray);letter-spacing:.1em}
-.search-icon{position:absolute;left:calc(2rem + 10px);top:50%;transform:translateY(-50%);width:15px;height:15px;opacity:.4;pointer-events:none}
-.search-clear{position:absolute;right:calc(2rem + 10px);top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray);font-size:1rem;cursor:pointer;display:none;padding:0 4px}
-.search-clear.on{display:block}
-.search-clear:hover{color:var(--white)}
+.search-toggle{background:none;border:1px solid rgba(255,255,255,.12);color:var(--gray-light);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;flex-shrink:0}
+.search-toggle:hover,.search-toggle.on{border-color:var(--pink);color:var(--pink)}
+.search-toggle svg{width:16px;height:16px}
+.search-bar{position:fixed;top:calc(34px + 68px);left:0;right:0;z-index:190;background:rgba(10,10,10,.95);backdrop-filter:blur(14px);padding:.8rem 3rem;border-bottom:1px solid rgba(255,255,255,.06);display:none;align-items:center}
+.search-bar.on{display:flex}
+.search-bar .search-input{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--white);padding:.7rem 2.2rem .7rem 1rem;font-family:'Raleway',sans-serif;font-size:.8rem;letter-spacing:.05em;outline:none;transition:border-color .3s;height:42px}
+.search-bar .search-input:focus{border-color:var(--pink)}
+.search-bar .search-input::placeholder{color:var(--gray);letter-spacing:.1em}
+.search-bar .search-clear{position:absolute;right:calc(3rem + 10px);top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray);font-size:.9rem;cursor:pointer;display:none;padding:0 4px}
+.search-bar .search-clear.on{display:block}
+.search-bar .search-clear:hover{color:var(--white)}
 .tabs{display:flex;justify-content:center;gap:.3rem;margin:0 auto 3rem;padding:0 2rem;flex-wrap:wrap;max-width:800px}
 .tab{background:none;border:1px solid rgba(255,255,255,.12);color:var(--gray-light);padding:.6rem 1.5rem;font-family:'Raleway',sans-serif;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .3s}
 .tab:hover{border-color:var(--pink);color:var(--pink)}
@@ -232,8 +285,19 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
     <li><a href="#info">Info</a></li>
     <li><a href="https://wa.me/573042634755" target="_blank">WhatsApp</a></li>
   </ul>
-  <button class="cart-btn" onclick="toggleCart()">Carrito <span class="cart-count" id="cartCount">0</span></button>
+  <div style="display:flex;align-items:center;gap:.6rem">
+    <button class="search-toggle" id="searchToggle" onclick="toggleSearch()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+    <button class="cart-btn" onclick="toggleCart()">Carrito <span class="cart-count" id="cartCount">0</span></button>
+  </div>
 </nav>
+
+<!-- Search dropdown -->
+<div class="search-bar" id="searchBar">
+  <input type="text" class="search-input" id="searchInput" placeholder="Buscar producto..." oninput="handleSearch()">
+  <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+</div>
 
 <section class="hero">
   <div class="hero-bg" id="heroBg"></div>
@@ -247,11 +311,6 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
   <div class="cat-header">
     <div class="section-label">Prendas disponibles</div>
     <h2>Nuestras Colecciones</h2>
-  </div>
-  <div class="search-wrap">
-    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" class="search-input" id="searchInput" placeholder="Buscar producto..." oninput="handleSearch()">
-    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="pgrid"><div class="loading-cat">Cargando catálogo…</div></div>
@@ -968,6 +1027,22 @@ async function publishChanges() {
 }
 
 // ── SEARCH ────────────────────────────────────────────────────────────────────
+function toggleSearch() {
+  const bar = document.getElementById('searchBar');
+  const btn = document.getElementById('searchToggle');
+  const input = document.getElementById('searchInput');
+  const isOpen = bar.classList.contains('on');
+  if (isOpen) {
+    clearSearch();
+    bar.classList.remove('on');
+    btn.classList.remove('on');
+  } else {
+    bar.classList.add('on');
+    btn.classList.add('on');
+    setTimeout(() => input.focus(), 100);
+  }
+}
+
 function handleSearch() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   document.getElementById('searchClear').classList.toggle('on', q.length > 0);
@@ -1011,6 +1086,8 @@ function openSearchResult(colId, idx) {
 function clearSearch() {
   document.getElementById('searchInput').value = '';
   document.getElementById('searchClear').classList.remove('on');
+  document.getElementById('searchBar').classList.remove('on');
+  document.getElementById('searchToggle').classList.remove('on');
   renderGrid();
 }
 
