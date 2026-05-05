@@ -109,6 +109,15 @@ nav{position:fixed;top:34px;left:0;right:0;z-index:200;display:flex;align-items:
 
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:rgba(255,255,255,.05)}
 .pcard{background:var(--black);position:relative;overflow:hidden;cursor:pointer}
+.pgrid.search-results .pcard{animation:searchIn .4s ease forwards;opacity:0}
+.pgrid.search-results .pcard:nth-child(1){animation-delay:.05s}
+.pgrid.search-results .pcard:nth-child(2){animation-delay:.1s}
+.pgrid.search-results .pcard:nth-child(3){animation-delay:.15s}
+.pgrid.search-results .pcard:nth-child(4){animation-delay:.2s}
+.pgrid.search-results .pcard:nth-child(5){animation-delay:.25s}
+.pgrid.search-results .pcard:nth-child(6){animation-delay:.3s}
+@keyframes searchIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.search-count{text-align:center;margin-bottom:1.5rem;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--pink)}
 .pimg{aspect-ratio:3/4;overflow:hidden;position:relative}
 .pimg img{width:100%;height:100%;object-fit:cover;object-position:top;transition:transform .7s cubic-bezier(.25,.46,.45,.94);filter:brightness(.9)}
 .pcard:hover .pimg img{transform:scale(1.05);filter:brightness(1)}
@@ -1160,7 +1169,7 @@ function renderSearchResults(results) {
     g.className = '';
     return;
   }
-  g.className = 'pgrid';
+  g.className = 'pgrid search-results';
   g.innerHTML = results.map(p => {
     const thumb = p.imgs && p.imgs.length ? p.imgs[0] : p.img;
     return `
