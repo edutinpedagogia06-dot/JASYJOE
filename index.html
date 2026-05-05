@@ -132,8 +132,8 @@ nav{position:fixed;top:34px;left:0;right:0;z-index:200;display:flex;align-items:
 .moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:1000;overflow-y:auto;backdrop-filter:blur(4px)}
 .moverlay.on{display:flex;align-items:flex-start;justify-content:center;padding:4rem 1rem}
 .modal{background:var(--black);border:1px solid rgba(255,255,255,.08);max-width:900px;width:100%;display:grid;grid-template-columns:1fr 1fr;position:relative}
-.mcls{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--gray);font-size:1.3rem;cursor:pointer;z-index:10}
-.mcls:hover{color:var(--white)}
+.mcls{position:absolute;top:.8rem;right:.8rem;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:1.1rem;cursor:pointer;z-index:10;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.mcls:hover{background:rgba(232,164,176,.7)}
 .mimg{aspect-ratio:3/4;overflow:hidden;position:relative}
 .mimg img{width:100%;height:100%;object-fit:cover;object-position:top;transition:opacity .3s}
 .mimg-thumbs{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:4px}
@@ -376,6 +376,10 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
         <div class="mbtnrow" id="mTypes"></div>
         <div class="mlabel">Talla</div>
         <div class="mbtnrow" id="mSizes"></div>
+        <div id="mColorsWrap" style="display:none">
+          <div class="mlabel">Color</div>
+          <div class="mbtnrow" id="mColors"></div>
+        </div>
       </div>
       <button class="buybtn" id="mAddBtn" onclick="addToCart()" disabled>Selecciona una talla</button>
     </div>
@@ -472,6 +476,7 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
         <div class="form-group"><label>Precio Detal ($)</label><input type="number" id="fDetal" placeholder="50000"></div>
         <div class="form-group"><label>Precio Mayor ($)</label><input type="number" id="fMayor" placeholder="28000"></div>
         <div class="form-group full"><label>Tallas disponibles</label><input type="text" id="fSizes" placeholder="XS, S, M, L (separadas por coma)"></div>
+        <div class="form-group full"><label>Colores disponibles (opcional)</label><input type="text" id="fColors" placeholder="Negro, Blanco, Azul (separados por coma)"></div>
         <div class="form-group full">
           <label>Fotos del producto (primera foto = portada)</label>
           <input type="file" id="fImg" accept="image/*" multiple onchange="previewImgs()">
@@ -519,7 +524,7 @@ let activeColId = null;     // active collection tab (storefront)
 let admColId = null;        // active collection in admin
 let editingColId = null;    // editing/creating collection
 let cart = [];
-let curProd = null, selSize = null, selType = 'Detal';
+let curProd = null, selSize = null, selType = 'Detal', selColor = null;
 let editingProdId = null, newImgB64 = null, newHeroImgB64 = null;
 let newImgsB64 = []; // multiple product images
 let modalImgIdx = 0; // current image index in modal gallery
@@ -700,7 +705,7 @@ function renderGrid() {
       <div class="pimg"><img src="${p.img}" alt="${p.name}"><div class="poverlay"><button class="qadd">Ver detalles</button></div></div>
       <div class="pinfo">
         <div class="pname">${p.name}</div><div class="ptype">${p.type}</div>
-        <div class="pprices"><span class="pdetal">${fmt(p.priceDetal)}</span><span class="pmayor">Mayor ${fmt(p.priceMayor)}</span></div>
+        <div class="pprices"><span class="pdetal">${fmt(p.priceDetal)}</span><span class="pmayor">Al por mayor ${fmt(p.priceMayor)}</span></div>
       </div>
     </div>`).join('');
 }
@@ -710,7 +715,7 @@ function openModal(idx) {
   const prods = getActiveProducts();
   const p = prods[idx];
   if (!p) return;
-  curProd = idx; selSize = null; selType = 'Detal';
+  curProd = idx; selSize = null; selType = 'Detal'; selColor = null;
   // Build images array (support old single img and new imgs array)
   const imgs = p.imgs && p.imgs.length ? p.imgs : [p.img];
   modalImgIdx = 0;
@@ -731,11 +736,19 @@ function openModal(idx) {
   }
   document.getElementById('mName').textContent = p.name;
   document.getElementById('mPDetal').textContent = fmt(p.priceDetal) + ' · Detal';
-  document.getElementById('mPMayor').textContent = fmt(p.priceMayor) + ' · Mayor (6+ und)';
+  document.getElementById('mPMayor').textContent = fmt(p.priceMayor) + ' · Al por mayor (6+ und)';
   const col = (storeData.collections||[]).find(c=>c.id===activeColId);
   document.getElementById('mColText').textContent = col ? col.name : '';
-  document.getElementById('mTypes').innerHTML = ['Detal','Mayor'].map((t,i) => `<button class="mchip${i===0?' on':''}" data-t="${t}" onclick="selT(this)">${t}${t==='Mayor'?' (6+ und)':''}</button>`).join('');
+  document.getElementById('mTypes').innerHTML = ['Detal','Al por mayor'].map((t,i) => `<button class="mchip${i===0?' on':''}" data-t="${t}" onclick="selT(this)">${t}${t==='Al por mayor'?' (6+ und)':''}</button>`).join('');
   document.getElementById('mSizes').innerHTML = (p.sizes||['XS','S','M','L']).map(s => `<button class="mchip" data-s="${s}" onclick="selS(this)">${s}</button>`).join('');
+  // Colors
+  const colorsWrap = document.getElementById('mColorsWrap');
+  if (p.colors && p.colors.length) {
+    colorsWrap.style.display = 'block';
+    document.getElementById('mColors').innerHTML = p.colors.map(c => `<button class="mchip" data-c="${c}" onclick="selC(this)">${c}</button>`).join('');
+  } else {
+    colorsWrap.style.display = 'none';
+  }
   const btn = document.getElementById('mAddBtn');
   btn.disabled = true; btn.textContent = 'Selecciona una talla';
   document.getElementById('moverlay').classList.add('on');
@@ -765,6 +778,7 @@ function modalImgGo(idx) {
 function closeModal() { document.getElementById('moverlay').classList.remove('on'); document.body.style.overflow = ''; }
 function selS(btn) { document.querySelectorAll('#mSizes .mchip').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); selSize = btn.dataset.s; document.getElementById('mAddBtn').disabled = false; document.getElementById('mAddBtn').textContent = 'Agregar al pedido'; }
 function selT(btn) { document.querySelectorAll('#mTypes .mchip').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); selType = btn.dataset.t; }
+function selC(btn) { document.querySelectorAll('#mColors .mchip').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); selColor = btn.dataset.c; }
 
 // ── CART ──────────────────────────────────────────────────────────────────────
 function addToCart() {
@@ -773,8 +787,8 @@ function addToCart() {
   const p = prods[curProd];
   if (!p) return;
   const col = (storeData.collections||[]).find(c=>c.id===activeColId);
-  const price = selType === 'Mayor' ? p.priceMayor : p.priceDetal;
-  cart.push({ name:p.name, type:p.type, size:selSize, purchaseType:selType, price, img:p.img, collection: col?col.name:'' });
+  const price = selType === 'Al por mayor' ? p.priceMayor : p.priceDetal;
+  cart.push({ name:p.name, type:p.type, size:selSize, color:selColor||'', purchaseType:selType, price, img:p.img, collection: col?col.name:'' });
   renderCart(); closeModal(); toggleCart();
 }
 function removeFromCart(i) { cart.splice(i,1); renderCart(); }
@@ -790,7 +804,7 @@ function renderCart() {
     items.innerHTML = `<div class="cempty"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><span>Tu pedido está vacío</span></div>`;
     footer.style.display = 'none';
   } else {
-    items.innerHTML = cart.map((it,i) => `<div class="citem"><img src="${it.img}" alt="${it.name}"><div class="citem-info"><div class="citem-name">${it.name}</div><div class="citem-det">Talla ${it.size} · ${it.purchaseType}</div><div class="citem-price">${fmt(it.price)}</div></div><button class="crm" onclick="removeFromCart(${i})">✕</button></div>`).join('');
+    items.innerHTML = cart.map((it,i) => `<div class="citem"><img src="${it.img}" alt="${it.name}"><div class="citem-info"><div class="citem-name">${it.name}</div><div class="citem-det">Talla ${it.size}${it.color?' · '+it.color:''} · ${it.purchaseType}</div><div class="citem-price">${fmt(it.price)}</div></div><button class="crm" onclick="removeFromCart(${i})">✕</button></div>`).join('');
     document.getElementById('ctotalNum').textContent = fmt(cart.reduce((s,i)=>s+i.price,0));
     footer.style.display = 'block';
   }
@@ -799,7 +813,7 @@ function renderCart() {
 function sendWA() {
   if (!cart.length) return;
   const lines = ['*🛍️ Hola JASY! Quiero hacer un pedido:*',''];
-  cart.forEach((it,i) => { lines.push(`*${i+1}. ${it.name}*`); lines.push(`   Colección: ${it.collection}`); lines.push(`   Tipo: ${it.purchaseType}`); lines.push(`   Talla: ${it.size}`); lines.push(`   Precio: ${fmt(it.price)}`); lines.push(''); });
+  cart.forEach((it,i) => { lines.push(`*${i+1}. ${it.name}*`); lines.push(`   Colección: ${it.collection}`); lines.push(`   Tipo: ${it.purchaseType}`); lines.push(`   Talla: ${it.size}`); if(it.color) lines.push(`   Color: ${it.color}`); lines.push(`   Precio: ${fmt(it.price)}`); lines.push(''); });
   lines.push(`*💰 Total: ${fmt(cart.reduce((s,i)=>s+i.price,0))}*`,'','_¿Tienen disponibilidad? ¿Cómo coordino el pago?_ 🙏');
   window.open(`https://wa.me/${CFG.whatsappNumber}?text=` + encodeURIComponent(lines.join('\n')), '_blank');
 }
@@ -943,7 +957,7 @@ function renderAdminList() {
   list.innerHTML = prods.map((p,idx) => {
     const thumb = p.imgs && p.imgs.length ? p.imgs[0] : p.img;
     const imgCount = p.imgs && p.imgs.length ? p.imgs.length : 1;
-    return `<div class="adm-item"><img src="${thumb}" alt="${p.name}"><div class="adm-item-info"><div class="adm-item-name">${p.name}</div><div class="adm-item-sub">${p.type} · Detal ${fmt(p.priceDetal)} · Mayor ${fmt(p.priceMayor)} · ${imgCount} foto${imgCount>1?'s':''}</div></div><div class="adm-item-btns"><button class="abtn" onclick="startEditProd(${idx})">Editar</button><button class="abtn danger" onclick="deleteProd(${idx})">Eliminar</button></div></div>`;
+    return `<div class="adm-item"><img src="${thumb}" alt="${p.name}"><div class="adm-item-info"><div class="adm-item-name">${p.name}</div><div class="adm-item-sub">${p.type} · Detal ${fmt(p.priceDetal)} · Al por mayor ${fmt(p.priceMayor)} · ${imgCount} foto${imgCount>1?'s':''}</div></div><div class="adm-item-btns"><button class="abtn" onclick="startEditProd(${idx})">Editar</button><button class="abtn danger" onclick="deleteProd(${idx})">Eliminar</button></div></div>`;
   }).join('');
 }
 
@@ -958,6 +972,7 @@ function startEditProd(idx) {
   document.getElementById('fDetal').value = p.priceDetal;
   document.getElementById('fMayor').value = p.priceMayor;
   document.getElementById('fSizes').value = (p.sizes||[]).join(', ');
+  document.getElementById('fColors').value = (p.colors||[]).join(', ');
   renderImgPreviews();
   document.getElementById('admFormTitle').textContent = 'Editar: ' + p.name;
   document.getElementById('admFormSection').scrollIntoView({behavior:'smooth'});
@@ -966,7 +981,7 @@ function startEditProd(idx) {
 function cancelEdit() { editingProdId = null; resetForm(); }
 function resetForm() {
   editingProdId = null; newImgsB64 = [];
-  ['fName','fType','fDetal','fMayor','fSizes'].forEach(id => document.getElementById(id).value = '');
+  ['fName','fType','fDetal','fMayor','fSizes','fColors'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('fImg').value = '';
   document.getElementById('imgPreviews').innerHTML = '';
   document.getElementById('admFormTitle').textContent = 'Agregar producto';
@@ -1012,15 +1027,16 @@ function saveProduct() {
   const detal = parseInt(document.getElementById('fDetal').value);
   const mayor = parseInt(document.getElementById('fMayor').value);
   const sizes = document.getElementById('fSizes').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const colors = document.getElementById('fColors').value.split(',').map(s=>s.trim()).filter(Boolean);
   if (!name || !type || isNaN(detal) || isNaN(mayor)) { alert('Completa nombre, tipo y precios'); return; }
   if (!sizes.length) { alert('Agrega al menos una talla'); return; }
   if (!col.products) col.products = [];
   if (editingProdId !== null) {
     const imgData = newImgsB64.length ? { img: newImgsB64[0], imgs: newImgsB64 } : {};
-    col.products[editingProdId] = { ...col.products[editingProdId], name, type, priceDetal:detal, priceMayor:mayor, sizes, ...imgData };
+    col.products[editingProdId] = { ...col.products[editingProdId], name, type, priceDetal:detal, priceMayor:mayor, sizes, colors, ...imgData };
   } else {
     if (!newImgsB64.length) { alert('Selecciona al menos una foto'); return; }
-    col.products.push({ id:'prod_'+Date.now(), name, type, priceDetal:detal, priceMayor:mayor, sizes, img:newImgsB64[0], imgs:newImgsB64 });
+    col.products.push({ id:'prod_'+Date.now(), name, type, priceDetal:detal, priceMayor:mayor, sizes, colors, img:newImgsB64[0], imgs:newImgsB64 });
   }
   markDirty(); renderGrid(); renderAdminList(); resetForm();
   showStatus('Producto guardado. Presiona "Publicar".', '');
@@ -1152,7 +1168,7 @@ function renderSearchResults(results) {
       <div class="pimg"><img src="${thumb}" alt="${p.name}"><div class="poverlay"><button class="qadd">Ver detalles</button></div></div>
       <div class="pinfo">
         <div class="pname">${p.name}</div><div class="ptype">${p.type} · ${p.colName}</div>
-        <div class="pprices"><span class="pdetal">${fmt(p.priceDetal)}</span><span class="pmayor">Mayor ${fmt(p.priceMayor)}</span></div>
+        <div class="pprices"><span class="pdetal">${fmt(p.priceDetal)}</span><span class="pmayor">Al por mayor ${fmt(p.priceMayor)}</span></div>
       </div>
     </div>`;
   }).join('');
