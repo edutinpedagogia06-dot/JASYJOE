@@ -117,6 +117,8 @@ nav{position:fixed;top:34px;left:0;right:0;z-index:200;display:flex;align-items:
 .pgrid.search-results .pcard:nth-child(5){animation-delay:.25s}
 .pgrid.search-results .pcard:nth-child(6){animation-delay:.3s}
 @keyframes searchIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+body.searching .hero,body.searching #info,body.searching footer,body.searching .tabs,body.searching .cat-header{display:none}
+body.searching #catalogo{padding-top:8rem}
 .search-count{text-align:center;margin-bottom:1.5rem;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--pink)}
 .pimg{aspect-ratio:3/4;overflow:hidden;position:relative}
 .pimg img{width:100%;height:100%;object-fit:cover;object-position:top;transition:transform .7s cubic-bezier(.25,.46,.45,.94);filter:brightness(.9)}
@@ -1149,8 +1151,9 @@ function toggleSearch() {
 function handleSearch() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   document.getElementById('searchClear').classList.toggle('on', q.length > 0);
-  if (q.length === 0) { renderGrid(); return; }
-  // Search across ALL collections
+  if (q.length === 0) { document.body.classList.remove('searching'); renderGrid(); return; }
+  document.body.classList.add('searching');
+  window.scrollTo({top:0});
   let results = [];
   (storeData.collections || []).forEach(col => {
     (col.products || []).forEach((p, idx) => {
@@ -1194,6 +1197,7 @@ function clearSearch() {
   document.getElementById('searchClear').classList.remove('on');
   document.getElementById('searchBar').classList.remove('on');
   document.getElementById('searchToggle').classList.remove('on');
+  document.body.classList.remove('searching');
   renderGrid();
 }
 
