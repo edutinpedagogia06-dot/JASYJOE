@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>JASY — Ropa Femenina en Barranquilla | Bodys, Blusas y Camisetas</title>
 <meta name="description" content="JASY Boutique — Tienda de ropa femenina en Barranquilla, Colombia. Bodys, blusas, camisetas y más. Moda consciente hecha en Colombia. Envíos a todo el país. Compra por WhatsApp.">
 <meta name="keywords" content="JASY, Jasy boutique, ropa femenina Barranquilla, bodys Colombia, blusas mujer, camisetas mujer, moda colombiana, tienda ropa mujer, ropa femenina Colombia, moda consciente">
@@ -145,13 +145,27 @@ body.searching #catalogo{padding-top:8rem}
 .modal{background:var(--black);border:1px solid rgba(255,255,255,.08);max-width:900px;width:100%;display:grid;grid-template-columns:1fr 1fr;position:relative}
 .mcls{position:absolute;top:.8rem;right:.8rem;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:1.1rem;cursor:pointer;z-index:10;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s}
 .mcls:hover{background:rgba(232,164,176,.7)}
-.mimg{overflow:hidden;position:relative;min-height:400px}
+.mimg-col{display:flex;flex-direction:column;overflow:hidden}
+.mimg{flex:1;overflow:hidden;position:relative;min-height:300px}
 .mimg img{width:100%;height:100%;object-fit:cover;object-position:center;transition:opacity .3s}
 .mimg-dots{display:flex;justify-content:center;gap:6px;padding:10px 0;background:var(--black)}
 .mimg-dots.hide{display:none}
 .mimg-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:all .2s;border:none;padding:0}
 .mimg-dot:hover{background:rgba(255,255,255,.5)}
 .mimg-dot.on{background:var(--pink)}
+
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.97);align-items:center;justify-content:center;flex-direction:column}
+.lightbox.on{display:flex}
+.lightbox-img{max-width:90vw;max-height:80vh;object-fit:contain}
+.lightbox-close{position:absolute;top:1.5rem;right:1.5rem;background:rgba(255,255,255,.1);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;z-index:10}
+.lightbox-close:hover{background:rgba(232,164,176,.5)}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);color:#fff;border:none;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.3rem;transition:background .2s}
+.lightbox-nav:hover{background:rgba(232,164,176,.5)}
+.lightbox-nav.prev{left:1.5rem}
+.lightbox-nav.next{right:1.5rem}
+.lightbox-nav.hide{display:none}
+.lightbox-counter{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:.7rem;letter-spacing:.15em}
 .mimg-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:background .2s;z-index:5}
 .mimg-nav:hover{background:rgba(232,164,176,.7)}
 .mimg-nav.prev{left:6px}
@@ -172,6 +186,12 @@ body.searching #catalogo{padding-top:8rem}
 .buybtn{width:100%;background:var(--pink);color:var(--black);border:none;padding:1rem;font-family:'Raleway',sans-serif;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;transition:background .3s;font-weight:400}
 .buybtn:hover{background:#d48a96}
 .buybtn:disabled{opacity:.35;cursor:not-allowed}
+
+/* QUANTITY */
+.qty-wrap{display:flex;align-items:center;gap:0;margin-bottom:1.5rem;width:fit-content}
+.qty-btn{background:none;border:1px solid rgba(255,255,255,.2);color:var(--white);width:36px;height:36px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:'Raleway',sans-serif}
+.qty-btn:hover{border-color:var(--pink);color:var(--pink)}
+.qty-num{width:50px;height:36px;display:flex;align-items:center;justify-content:center;border-top:1px solid rgba(255,255,255,.2);border-bottom:1px solid rgba(255,255,255,.2);font-family:'Cormorant Garamond',serif;font-size:1.1rem}
 
 /* CART */
 .cart{position:fixed;top:0;right:-420px;width:400px;height:100vh;background:#111;border-left:1px solid rgba(255,255,255,.08);z-index:400;transition:right .4s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;padding:2rem;overflow-y:auto}
@@ -371,13 +391,15 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
 <div class="moverlay" id="moverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <button class="mcls" onclick="closeModal()">✕</button>
-    <div class="mimg" id="mimgWrap">
-      <img id="mImg" src="" alt="">
-      <button class="mimg-nav prev hide" id="mNavPrev" onclick="modalImgNav(-1)">‹</button>
-      <button class="mimg-nav next hide" id="mNavNext" onclick="modalImgNav(1)">›</button>
-      <div class="mimg-counter hide" id="mImgCounter">1 / 1</div>
+    <div class="mimg-col">
+      <div class="mimg" id="mimgWrap">
+        <img id="mImg" src="" alt="" onclick="openLightbox()" style="cursor:zoom-in">
+        <button class="mimg-nav prev hide" id="mNavPrev" onclick="modalImgNav(-1)">‹</button>
+        <button class="mimg-nav next hide" id="mNavNext" onclick="modalImgNav(1)">›</button>
+        <div class="mimg-counter hide" id="mImgCounter">1 / 1</div>
+      </div>
+      <div class="mimg-dots hide" id="mImgDots"></div>
     </div>
-    <div class="mimg-dots hide" id="mImgDots"></div>
     <div class="mbody">
       <div>
         <div class="mcol" id="mColText"></div>
@@ -392,6 +414,12 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
         <div id="mColorsWrap" style="display:none">
           <div class="mlabel">Color</div>
           <div class="mbtnrow" id="mColors"></div>
+        </div>
+        <div class="mlabel">Cantidad</div>
+        <div class="qty-wrap">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-num" id="mQty">1</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
         </div>
       </div>
       <button class="buybtn" id="mAddBtn" onclick="addToCart()" disabled>Selecciona una talla</button>
@@ -502,6 +530,15 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
   </div>
 </div>
 
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav prev" id="lbPrev" onclick="lbNav(-1)">‹</button>
+  <button class="lightbox-nav next" id="lbNext" onclick="lbNav(1)">›</button>
+  <img class="lightbox-img" id="lbImg" src="" alt="">
+  <div class="lightbox-counter" id="lbCounter"></div>
+</div>
+
 <script>
 const CFG = {
   githubUser: 'edutinpedagogia06-dot',
@@ -537,7 +574,7 @@ let activeColId = null;     // active collection tab (storefront)
 let admColId = null;        // active collection in admin
 let editingColId = null;    // editing/creating collection
 let cart = [];
-let curProd = null, selSize = null, selType = 'Detal', selColor = null;
+let curProd = null, selSize = null, selType = 'Detal', selColor = null, selQty = 1;
 let editingProdId = null, newImgB64 = null, newHeroImgB64 = null;
 let newImgsB64 = []; // multiple product images
 let modalImgIdx = 0; // current image index in modal gallery
@@ -728,7 +765,7 @@ function openModal(idx) {
   const prods = getActiveProducts();
   const p = prods[idx];
   if (!p) return;
-  curProd = idx; selSize = null; selType = 'Detal'; selColor = null;
+  curProd = idx; selSize = null; selType = 'Detal'; selColor = null; selQty = 1;
   // Build images array (support old single img and new imgs array)
   const imgs = p.imgs && p.imgs.length ? p.imgs : [p.img];
   modalImgIdx = 0;
@@ -764,6 +801,7 @@ function openModal(idx) {
   }
   const btn = document.getElementById('mAddBtn');
   btn.disabled = true; btn.textContent = 'Selecciona una talla';
+  document.getElementById('mQty').textContent = '1';
   document.getElementById('moverlay').classList.add('on');
   document.body.style.overflow = 'hidden';
 }
@@ -792,6 +830,7 @@ function closeModal() { document.getElementById('moverlay').classList.remove('on
 function selS(btn) { document.querySelectorAll('#mSizes .mchip').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); selSize = btn.dataset.s; document.getElementById('mAddBtn').disabled = false; document.getElementById('mAddBtn').textContent = 'Agregar al pedido'; }
 function selT(btn) { document.querySelectorAll('#mTypes .mchip').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); selType = btn.dataset.t; }
 function selC(btn) { document.querySelectorAll('#mColors .mchip').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); selColor = btn.dataset.c; }
+function changeQty(d) { selQty = Math.max(1, selQty + d); document.getElementById('mQty').textContent = selQty; }
 
 // ── CART ──────────────────────────────────────────────────────────────────────
 function addToCart() {
@@ -801,7 +840,7 @@ function addToCart() {
   if (!p) return;
   const col = (storeData.collections||[]).find(c=>c.id===activeColId);
   const price = selType === 'Al por mayor' ? p.priceMayor : p.priceDetal;
-  cart.push({ name:p.name, type:p.type, size:selSize, color:selColor||'', purchaseType:selType, price, img:p.img, collection: col?col.name:'' });
+  cart.push({ name:p.name, type:p.type, size:selSize, color:selColor||'', purchaseType:selType, price, qty:selQty, img:p.img, collection: col?col.name:'' });
   renderCart(); closeModal(); toggleCart();
 }
 function removeFromCart(i) { cart.splice(i,1); renderCart(); }
@@ -811,14 +850,15 @@ function renderCart() {
   const cnt = document.getElementById('cartCount');
   const items = document.getElementById('citems');
   const footer = document.getElementById('cfooter');
-  cnt.textContent = cart.length;
-  cnt.classList.toggle('on', cart.length > 0);
+  const totalItems = cart.reduce((s,i)=>s+(i.qty||1),0);
+  cnt.textContent = totalItems;
+  cnt.classList.toggle('on', totalItems > 0);
   if (!cart.length) {
     items.innerHTML = `<div class="cempty"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><span>Tu pedido está vacío</span></div>`;
     footer.style.display = 'none';
   } else {
-    items.innerHTML = cart.map((it,i) => `<div class="citem"><img src="${it.img}" alt="${it.name}"><div class="citem-info"><div class="citem-name">${it.name}</div><div class="citem-det">Talla ${it.size}${it.color?' · '+it.color:''} · ${it.purchaseType}</div><div class="citem-price">${fmt(it.price)}</div></div><button class="crm" onclick="removeFromCart(${i})">✕</button></div>`).join('');
-    document.getElementById('ctotalNum').textContent = fmt(cart.reduce((s,i)=>s+i.price,0));
+    items.innerHTML = cart.map((it,i) => `<div class="citem"><img src="${it.img}" alt="${it.name}"><div class="citem-info"><div class="citem-name">${it.name}${it.qty>1?' × '+it.qty:''}</div><div class="citem-det">Talla ${it.size}${it.color?' · '+it.color:''} · ${it.purchaseType}</div><div class="citem-price">${fmt(it.price * (it.qty||1))}</div></div><button class="crm" onclick="removeFromCart(${i})">✕</button></div>`).join('');
+    document.getElementById('ctotalNum').textContent = fmt(cart.reduce((s,i)=>s+i.price*(i.qty||1),0));
     footer.style.display = 'block';
   }
 }
@@ -826,8 +866,8 @@ function renderCart() {
 function sendWA() {
   if (!cart.length) return;
   const lines = ['*🛍️ Hola JASY! Quiero hacer un pedido:*',''];
-  cart.forEach((it,i) => { lines.push(`*${i+1}. ${it.name}*`); lines.push(`   Colección: ${it.collection}`); lines.push(`   Tipo: ${it.purchaseType}`); lines.push(`   Talla: ${it.size}`); if(it.color) lines.push(`   Color: ${it.color}`); lines.push(`   Precio: ${fmt(it.price)}`); lines.push(''); });
-  lines.push(`*💰 Total: ${fmt(cart.reduce((s,i)=>s+i.price,0))}*`,'','_¿Tienen disponibilidad? ¿Cómo coordino el pago?_ 🙏');
+  cart.forEach((it,i) => { lines.push(`*${i+1}. ${it.name}*`); lines.push(`   Colección: ${it.collection}`); lines.push(`   Tipo: ${it.purchaseType}`); lines.push(`   Talla: ${it.size}`); if(it.color) lines.push(`   Color: ${it.color}`); lines.push(`   Cantidad: ${it.qty||1}`); lines.push(`   Precio: ${fmt(it.price*(it.qty||1))}`); lines.push(''); });
+  lines.push(`*💰 Total: ${fmt(cart.reduce((s,i)=>s+i.price*(i.qty||1),0))}*`,'','_¿Tienen disponibilidad? ¿Cómo coordino el pago?_ 🙏');
   window.open(`https://wa.me/${CFG.whatsappNumber}?text=` + encodeURIComponent(lines.join('\n')), '_blank');
 }
 
@@ -1203,9 +1243,42 @@ function clearSearch() {
   renderGrid();
 }
 
+// ── LIGHTBOX ──────────────────────────────────────────────────────────────────
+let lbImgs = [];
+let lbIdx = 0;
+
+function openLightbox() {
+  const prods = getActiveProducts();
+  const p = prods[curProd];
+  if (!p) return;
+  lbImgs = p.imgs && p.imgs.length ? p.imgs : [p.img];
+  lbIdx = modalImgIdx || 0;
+  document.getElementById('lbImg').src = lbImgs[lbIdx];
+  document.getElementById('lbCounter').textContent = (lbIdx+1) + ' / ' + lbImgs.length;
+  document.getElementById('lbPrev').classList.toggle('hide', lbImgs.length <= 1);
+  document.getElementById('lbNext').classList.toggle('hide', lbImgs.length <= 1);
+  document.getElementById('lightbox').classList.add('on');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('on');
+}
+
+function lbNav(dir) {
+  lbIdx = (lbIdx + dir + lbImgs.length) % lbImgs.length;
+  document.getElementById('lbImg').src = lbImgs[lbIdx];
+  document.getElementById('lbCounter').textContent = (lbIdx+1) + ' / ' + lbImgs.length;
+}
+
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-  if (document.getElementById('moverlay').classList.contains('on')) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('lightbox').classList.contains('on')) closeLightbox();
+    else closeModal();
+  }
+  if (document.getElementById('lightbox').classList.contains('on')) {
+    if (e.key === 'ArrowLeft') lbNav(-1);
+    if (e.key === 'ArrowRight') lbNav(1);
+  } else if (document.getElementById('moverlay').classList.contains('on')) {
     if (e.key === 'ArrowLeft') modalImgNav(-1);
     if (e.key === 'ArrowRight') modalImgNav(1);
   }
