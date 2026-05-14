@@ -147,17 +147,17 @@ body.searching #catalogo{padding-top:8rem}
 .mcls:hover{background:rgba(232,164,176,.7)}
 .mimg{aspect-ratio:3/4;overflow:hidden;position:relative}
 .mimg img{width:100%;height:100%;object-fit:cover;object-position:top;transition:opacity .3s}
-.mimg-thumbs{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:4px}
-.mimg-thumbs.hide{display:none}
-.mimg-thumb{width:40px;height:50px;object-fit:cover;object-position:top;border:2px solid transparent;cursor:pointer;opacity:.5;transition:all .2s}
-.mimg-thumb:hover{opacity:.8}
-.mimg-thumb.on{border-color:var(--pink);opacity:1}
-.mimg-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;transition:background .2s}
+.mimg-dots{display:flex;justify-content:center;gap:6px;padding:10px 0;background:var(--black)}
+.mimg-dots.hide{display:none}
+.mimg-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:all .2s;border:none;padding:0}
+.mimg-dot:hover{background:rgba(255,255,255,.5)}
+.mimg-dot.on{background:var(--pink)}
+.mimg-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:background .2s;z-index:5}
 .mimg-nav:hover{background:rgba(232,164,176,.7)}
-.mimg-nav.prev{left:8px}
-.mimg-nav.next{right:8px}
+.mimg-nav.prev{left:6px}
+.mimg-nav.next{right:6px}
 .mimg-nav.hide{display:none}
-.mimg-counter{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;font-size:.65rem;letter-spacing:.1em;padding:4px 10px;border-radius:3px}
+.mimg-counter{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;font-size:.6rem;padding:3px 7px;border-radius:3px;letter-spacing:.1em;z-index:5}
 .mimg-counter.hide{display:none}
 .mbody{padding:3rem 2.5rem;display:flex;flex-direction:column;justify-content:space-between}
 .mcol{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--pink);margin-bottom:1.5rem}
@@ -290,7 +290,9 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
 
 @media(max-width:768px){
   nav{padding:1rem 1.2rem} .nav-links{display:none}
-  .modal{grid-template-columns:1fr} .mimg{aspect-ratio:auto;max-height:55vh} .mbody{padding:2rem 1.5rem}
+  .modal{grid-template-columns:1fr} .mimg{aspect-ratio:auto;max-height:50vh} .mbody{padding:2rem 1.5rem}
+  .mimg-nav{width:28px;height:28px;font-size:.85rem}
+  .mimg-counter{font-size:.55rem}
   .cart{width:100%;right:-100%}
   footer{flex-direction:column;text-align:center}
   #info{padding:4rem 1.5rem}
@@ -374,8 +376,8 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
       <button class="mimg-nav prev hide" id="mNavPrev" onclick="modalImgNav(-1)">‹</button>
       <button class="mimg-nav next hide" id="mNavNext" onclick="modalImgNav(1)">›</button>
       <div class="mimg-counter hide" id="mImgCounter">1 / 1</div>
-      <div class="mimg-thumbs hide" id="mImgThumbs"></div>
     </div>
+    <div class="mimg-dots hide" id="mImgDots"></div>
     <div class="mbody">
       <div>
         <div class="mcol" id="mColText"></div>
@@ -737,13 +739,13 @@ function openModal(idx) {
   document.getElementById('mNavNext').classList.toggle('hide', !hasMultiple);
   document.getElementById('mImgCounter').classList.toggle('hide', !hasMultiple);
   document.getElementById('mImgCounter').textContent = '1 / ' + imgs.length;
-  const thumbsEl = document.getElementById('mImgThumbs');
+  const dotsEl = document.getElementById('mImgDots');
   if (hasMultiple) {
-    thumbsEl.classList.remove('hide');
-    thumbsEl.innerHTML = imgs.map((src,i) => `<img class="mimg-thumb${i===0?' on':''}" src="${src}" onclick="modalImgGo(${i})">`).join('');
+    dotsEl.classList.remove('hide');
+    dotsEl.innerHTML = imgs.map((src,i) => `<button class="mimg-dot${i===0?' on':''}" onclick="modalImgGo(${i})"></button>`).join('');
   } else {
-    thumbsEl.classList.add('hide');
-    thumbsEl.innerHTML = '';
+    dotsEl.classList.add('hide');
+    dotsEl.innerHTML = '';
   }
   document.getElementById('mName').textContent = p.name;
   document.getElementById('mPDetal').textContent = fmt(p.priceDetal) + ' · Detal';
@@ -784,7 +786,7 @@ function modalImgGo(idx) {
   modalImgIdx = idx;
   document.getElementById('mImg').src = imgs[idx];
   document.getElementById('mImgCounter').textContent = (idx+1) + ' / ' + imgs.length;
-  document.querySelectorAll('.mimg-thumb').forEach((t,i) => t.classList.toggle('on', i===idx));
+  document.querySelectorAll('.mimg-dot').forEach((t,i) => t.classList.toggle('on', i===idx));
 }
 function closeModal() { document.getElementById('moverlay').classList.remove('on'); document.body.style.overflow = ''; }
 function selS(btn) { document.querySelectorAll('#mSizes .mchip').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); selSize = btn.dataset.s; document.getElementById('mAddBtn').disabled = false; document.getElementById('mAddBtn').textContent = 'Agregar al pedido'; }
