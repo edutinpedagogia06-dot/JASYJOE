@@ -132,12 +132,11 @@ body.searching #catalogo{padding-top:8rem}
 .pinfo{padding:1.4rem 1.4rem 2rem;border-top:1px solid rgba(255,255,255,.06)}
 .pname{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:300;letter-spacing:.08em;margin-bottom:.25rem}
 .ptype{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);margin-bottom:.9rem}
-.pprices{display:flex;gap:.8rem;align-items:baseline;flex-wrap:wrap}
+.pprices{display:flex;gap:1.2rem;align-items:baseline;flex-wrap:wrap}
 .pdetal{font-size:1.05rem;font-family:'Cormorant Garamond',serif}
-.pdetal-old{font-size:.9rem;font-family:'Cormorant Garamond',serif;color:var(--gray);position:relative}
-.pdetal-old::after{content:'';position:absolute;left:-2px;right:-2px;top:50%;height:1px;background:var(--gray)}
+.pdetal-old{font-size:.82rem;font-family:'Cormorant Garamond',serif;text-decoration:line-through;color:var(--gray);margin-right:.3rem}
 .pmayor{font-size:.72rem;color:var(--pink)}
-.discount-badge{position:absolute;top:10px;left:10px;background:var(--pink);color:var(--black);font-size:.65rem;font-weight:400;padding:5px 10px;z-index:3;font-family:'Cormorant Garamond',serif;letter-spacing:.02em}
+.discount-badge{position:absolute;top:10px;left:10px;background:var(--pink);color:var(--black);font-size:.6rem;font-weight:400;letter-spacing:.1em;padding:4px 8px;z-index:3;font-family:'Raleway',sans-serif}
 
 .empty-cat{text-align:center;padding:6rem 2rem;color:var(--gray)}
 .empty-cat svg{opacity:.3;margin-bottom:1rem}
@@ -182,8 +181,7 @@ body.searching #catalogo{padding-top:8rem}
 .mcol{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--pink);margin-bottom:1.5rem}
 .mname{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:300;letter-spacing:.06em;margin-bottom:1.5rem}
 .mpdetal{font-family:'Cormorant Garamond',serif;font-size:1.7rem;margin-bottom:.3rem}
-.mpdetal-old{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gray);margin-bottom:.3rem;position:relative;display:inline-block}
-.mpdetal-old::after{content:'';position:absolute;left:-2px;right:-2px;top:50%;height:1px;background:var(--gray)}
+.mpdetal-old{font-family:'Cormorant Garamond',serif;font-size:1.1rem;text-decoration:line-through;color:var(--gray);margin-bottom:.3rem}
 .mpmayor{font-size:.75rem;color:var(--pink);letter-spacing:.1em;margin-bottom:1.5rem}
 .mdiv{height:1px;background:rgba(255,255,255,.08);margin:1.2rem 0}
 .mlabel{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);margin-bottom:.7rem}
@@ -1326,18 +1324,6 @@ document.addEventListener('keydown', e => {
   }
 });
 loadData();
-
-// Prevent iOS zoom on inputs
-document.addEventListener('touchstart', function(e) {
-  if (e.touches.length > 1) e.preventDefault();
-}, {passive: false});
-
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function(e) {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) e.preventDefault();
-  lastTouchEnd = now;
-}, false);
 </script>
 </body>
 </html>
