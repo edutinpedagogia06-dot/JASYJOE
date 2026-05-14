@@ -132,9 +132,11 @@ body.searching #catalogo{padding-top:8rem}
 .pinfo{padding:1.4rem 1.4rem 2rem;border-top:1px solid rgba(255,255,255,.06)}
 .pname{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:300;letter-spacing:.08em;margin-bottom:.25rem}
 .ptype{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);margin-bottom:.9rem}
-.pprices{display:flex;gap:1.2rem;align-items:baseline}
+.pprices{display:flex;gap:1.2rem;align-items:baseline;flex-wrap:wrap}
 .pdetal{font-size:1.05rem;font-family:'Cormorant Garamond',serif}
+.pdetal-old{font-size:.82rem;font-family:'Cormorant Garamond',serif;text-decoration:line-through;color:var(--gray);margin-right:.3rem}
 .pmayor{font-size:.72rem;color:var(--pink)}
+.discount-badge{position:absolute;top:10px;left:10px;background:var(--pink);color:var(--black);font-size:.6rem;font-weight:400;letter-spacing:.1em;padding:4px 8px;z-index:3;font-family:'Raleway',sans-serif}
 
 .empty-cat{text-align:center;padding:6rem 2rem;color:var(--gray)}
 .empty-cat svg{opacity:.3;margin-bottom:1rem}
@@ -179,6 +181,7 @@ body.searching #catalogo{padding-top:8rem}
 .mcol{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--pink);margin-bottom:1.5rem}
 .mname{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:300;letter-spacing:.06em;margin-bottom:1.5rem}
 .mpdetal{font-family:'Cormorant Garamond',serif;font-size:1.7rem;margin-bottom:.3rem}
+.mpdetal-old{font-family:'Cormorant Garamond',serif;font-size:1.1rem;text-decoration:line-through;color:var(--gray);margin-bottom:.3rem}
 .mpmayor{font-size:.75rem;color:var(--pink);letter-spacing:.1em;margin-bottom:1.5rem}
 .mdiv{height:1px;background:rgba(255,255,255,.08);margin:1.2rem 0}
 .mlabel{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);margin-bottom:.7rem}
@@ -406,6 +409,7 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
       <div>
         <div class="mcol" id="mColText"></div>
         <div class="mname" id="mName"></div>
+        <div class="mpdetal-old" id="mPDetalOld" style="display:none"></div>
         <div class="mpdetal" id="mPDetal"></div>
         <div class="mpmayor" id="mPMayor"></div>
         <div class="mdiv"></div>
@@ -518,6 +522,7 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
         <div class="form-group"><label>Tipo</label><input type="text" id="fType" placeholder="Ej: Camiseta, Body, Blusa"></div>
         <div class="form-group"><label>Precio Detal ($)</label><input type="number" id="fDetal" placeholder="50000"></div>
         <div class="form-group"><label>Precio Mayor ($)</label><input type="number" id="fMayor" placeholder="28000"></div>
+        <div class="form-group"><label>Descuento % (opcional)</label><input type="number" id="fDiscount" placeholder="0" min="0" max="99"></div>
         <div class="form-group full"><label>Tallas disponibles</label><input type="text" id="fSizes" placeholder="XS, S, M, L (separadas por coma)"></div>
         <div class="form-group full"><label>Colores disponibles (opcional)</label><input type="text" id="fColors" placeholder="Negro, Blanco, Azul (separados por coma)"></div>
         <div class="form-group full">
@@ -587,6 +592,7 @@ document.getElementById('navLogo').src = CFG.logoUrl;
 document.getElementById('footerLogo').src = CFG.logoUrl;
 
 function fmt(n) { return '$' + Number(n).toLocaleString('es-CO'); }
+function discountPrice(price, discount) { return Math.round(price * (1 - discount/100)); }
 
 // ── LOAD DATA ────────────────────────────────────────────────────────────────
 async function loadData() {
@@ -752,14 +758,26 @@ function renderGrid() {
     return;
   }
   g.className = 'pgrid';
-  g.innerHTML = prods.map((p,idx) => `
+  g.innerHTML = prods.map((p,idx) => {
+    const d = p.discount || 0;
+    const detalShow = d > 0 ? discountPrice(p.priceDetal, d) : p.priceDetal;
+    const mayorShow = d > 0 ? discountPrice(p.priceMayor, d) : p.priceMayor;
+    return `
     <div class="pcard" onclick="openModal(${idx})">
-      <div class="pimg"><img src="${p.img}" alt="${p.name}"><div class="poverlay"><button class="qadd">Ver detalles</button></div></div>
+      <div class="pimg">
+        ${d > 0 ? `<div class="discount-badge">-${d}%</div>` : ''}
+        <img src="${p.img}" alt="${p.name}"><div class="poverlay"><button class="qadd">Ver detalles</button></div>
+      </div>
       <div class="pinfo">
         <div class="pname">${p.name}</div><div class="ptype">${p.type}</div>
-        <div class="pprices"><span class="pdetal">${fmt(p.priceDetal)}</span><span class="pmayor">Al por mayor ${fmt(p.priceMayor)}</span></div>
+        <div class="pprices">
+          ${d > 0 ? `<span class="pdetal-old">${fmt(p.priceDetal)}</span>` : ''}
+          <span class="pdetal">${fmt(detalShow)}</span>
+          <span class="pmayor">Al por mayor ${fmt(mayorShow)}</span>
+        </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ── PRODUCT MODAL ────────────────────────────────────────────────────────────
@@ -787,8 +805,14 @@ function openModal(idx) {
     dotsEl.innerHTML = '';
   }
   document.getElementById('mName').textContent = p.name;
-  document.getElementById('mPDetal').textContent = fmt(p.priceDetal) + ' · Detal';
-  document.getElementById('mPMayor').textContent = fmt(p.priceMayor) + ' · Al por mayor (6+ und)';
+  const d = p.discount || 0;
+  const detalShow = d > 0 ? discountPrice(p.priceDetal, d) : p.priceDetal;
+  const mayorShow = d > 0 ? discountPrice(p.priceMayor, d) : p.priceMayor;
+  const oldEl = document.getElementById('mPDetalOld');
+  if (d > 0) { oldEl.textContent = fmt(p.priceDetal) + ' · Detal'; oldEl.style.display = 'block'; }
+  else { oldEl.style.display = 'none'; }
+  document.getElementById('mPDetal').textContent = fmt(detalShow) + ' · Detal' + (d > 0 ? ' (-' + d + '%)' : '');
+  document.getElementById('mPMayor').textContent = fmt(mayorShow) + ' · Al por mayor (6+ und)';
   const col = (storeData.collections||[]).find(c=>c.id===activeColId);
   document.getElementById('mColText').textContent = col ? col.name : '';
   document.getElementById('mTypes').innerHTML = ['Detal','Al por mayor'].map((t,i) => `<button class="mchip${i===0?' on':''}" data-t="${t}" onclick="selT(this)">${t}${t==='Al por mayor'?' (6+ und)':''}</button>`).join('');
@@ -841,7 +865,9 @@ function addToCart() {
   const p = prods[curProd];
   if (!p) return;
   const col = (storeData.collections||[]).find(c=>c.id===activeColId);
-  const price = selType === 'Al por mayor' ? p.priceMayor : p.priceDetal;
+  const d = p.discount || 0;
+  const basePrice = selType === 'Al por mayor' ? p.priceMayor : p.priceDetal;
+  const price = d > 0 ? discountPrice(basePrice, d) : basePrice;
   cart.push({ name:p.name, type:p.type, size:selSize, color:selColor||'', purchaseType:selType, price, qty:selQty, img:p.img, collection: col?col.name:'' });
   renderCart(); closeModal(); toggleCart();
 }
@@ -1028,6 +1054,7 @@ function startEditProd(idx) {
   document.getElementById('fMayor').value = p.priceMayor;
   document.getElementById('fSizes').value = (p.sizes||[]).join(', ');
   document.getElementById('fColors').value = (p.colors||[]).join(', ');
+  document.getElementById('fDiscount').value = p.discount || 0;
   renderImgPreviews();
   document.getElementById('admFormTitle').textContent = 'Editar: ' + p.name;
   document.getElementById('admFormSection').scrollIntoView({behavior:'smooth'});
@@ -1036,7 +1063,7 @@ function startEditProd(idx) {
 function cancelEdit() { editingProdId = null; resetForm(); }
 function resetForm() {
   editingProdId = null; newImgsB64 = [];
-  ['fName','fType','fDetal','fMayor','fSizes','fColors'].forEach(id => document.getElementById(id).value = '');
+  ['fName','fType','fDetal','fMayor','fDiscount','fSizes','fColors'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('fImg').value = '';
   document.getElementById('imgPreviews').innerHTML = '';
   document.getElementById('admFormTitle').textContent = 'Agregar producto';
@@ -1081,6 +1108,7 @@ function saveProduct() {
   const type = document.getElementById('fType').value.trim();
   const detal = parseInt(document.getElementById('fDetal').value);
   const mayor = parseInt(document.getElementById('fMayor').value);
+  const discount = parseInt(document.getElementById('fDiscount').value) || 0;
   const sizes = document.getElementById('fSizes').value.split(',').map(s=>s.trim()).filter(Boolean);
   const colors = document.getElementById('fColors').value.split(',').map(s=>s.trim()).filter(Boolean);
   if (!name || !type || isNaN(detal) || isNaN(mayor)) { alert('Completa nombre, tipo y precios'); return; }
@@ -1088,10 +1116,10 @@ function saveProduct() {
   if (!col.products) col.products = [];
   if (editingProdId !== null) {
     const imgData = newImgsB64.length ? { img: newImgsB64[0], imgs: newImgsB64 } : {};
-    col.products[editingProdId] = { ...col.products[editingProdId], name, type, priceDetal:detal, priceMayor:mayor, sizes, colors, ...imgData };
+    col.products[editingProdId] = { ...col.products[editingProdId], name, type, priceDetal:detal, priceMayor:mayor, discount, sizes, colors, ...imgData };
   } else {
     if (!newImgsB64.length) { alert('Selecciona al menos una foto'); return; }
-    col.products.push({ id:'prod_'+Date.now(), name, type, priceDetal:detal, priceMayor:mayor, sizes, colors, img:newImgsB64[0], imgs:newImgsB64 });
+    col.products.push({ id:'prod_'+Date.now(), name, type, priceDetal:detal, priceMayor:mayor, discount, sizes, colors, img:newImgsB64[0], imgs:newImgsB64 });
   }
   markDirty(); renderGrid(); renderAdminList(); resetForm();
   showStatus('Producto guardado. Presiona "Publicar".', '');
@@ -1219,12 +1247,22 @@ function renderSearchResults(results) {
   g.className = 'pgrid search-results';
   g.innerHTML = results.map(p => {
     const thumb = p.imgs && p.imgs.length ? p.imgs[0] : p.img;
+    const d = p.discount || 0;
+    const detalShow = d > 0 ? discountPrice(p.priceDetal, d) : p.priceDetal;
+    const mayorShow = d > 0 ? discountPrice(p.priceMayor, d) : p.priceMayor;
     return `
     <div class="pcard" onclick="openSearchResult('${p.colId}',${p.idx})">
-      <div class="pimg"><img src="${thumb}" alt="${p.name}"><div class="poverlay"><button class="qadd">Ver detalles</button></div></div>
+      <div class="pimg">
+        ${d > 0 ? `<div class="discount-badge">-${d}%</div>` : ''}
+        <img src="${thumb}" alt="${p.name}"><div class="poverlay"><button class="qadd">Ver detalles</button></div>
+      </div>
       <div class="pinfo">
         <div class="pname">${p.name}</div><div class="ptype">${p.type} · ${p.colName}</div>
-        <div class="pprices"><span class="pdetal">${fmt(p.priceDetal)}</span><span class="pmayor">Al por mayor ${fmt(p.priceMayor)}</span></div>
+        <div class="pprices">
+          ${d > 0 ? `<span class="pdetal-old">${fmt(p.priceDetal)}</span>` : ''}
+          <span class="pdetal">${fmt(detalShow)}</span>
+          <span class="pmayor">Al por mayor ${fmt(mayorShow)}</span>
+        </div>
       </div>
     </div>`;
   }).join('');
