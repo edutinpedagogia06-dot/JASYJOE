@@ -1040,7 +1040,7 @@ function renderAdminList() {
   list.innerHTML = prods.map((p,idx) => {
     const thumb = p.imgs && p.imgs.length ? p.imgs[0] : p.img;
     const imgCount = p.imgs && p.imgs.length ? p.imgs.length : 1;
-    return `<div class="adm-item"><img src="${thumb}" alt="${p.name}"><div class="adm-item-info"><div class="adm-item-name">${p.name}</div><div class="adm-item-sub">${p.type} · Detal ${fmt(p.priceDetal)} · Al por mayor ${fmt(p.priceMayor)} · ${imgCount} foto${imgCount>1?'s':''}</div></div><div class="adm-item-btns"><button class="abtn" onclick="startEditProd(${idx})">Editar</button><button class="abtn" onclick="moveProduct(${idx})">Mover</button><button class="abtn danger" onclick="deleteProd(${idx})">Eliminar</button></div></div>`;
+    return `<div class="adm-item"><img src="${thumb}" alt="${p.name}"><div class="adm-item-info"><div class="adm-item-name">${p.name}</div><div class="adm-item-sub">${p.type} · Detal ${fmt(p.priceDetal)} · Al por mayor ${fmt(p.priceMayor)} · ${imgCount} foto${imgCount>1?'s':''}</div></div><div class="adm-item-btns"><button class="abtn" onclick="startEditProd(${idx})">Editar</button><button class="abtn danger" onclick="deleteProd(${idx})">Eliminar</button></div></div>`;
   }).join('');
 }
 
@@ -1125,26 +1125,6 @@ function saveProduct() {
   }
   markDirty(); renderGrid(); renderAdminList(); resetForm();
   showStatus('Producto guardado. Presiona "Publicar".', '');
-}
-
-function moveProduct(idx) {
-  const col = getAdmCol();
-  if (!col || !col.products[idx]) return;
-  const p = col.products[idx];
-  const otherCols = (storeData.collections||[]).filter(c => c.id !== admColId);
-  if (!otherCols.length) { alert('No hay otras colecciones. Crea una primero.'); return; }
-  const names = otherCols.map((c,i) => `${i+1}. ${c.name}`).join('\n');
-  const choice = prompt('Mover "' + p.name + '" a:\n\n' + names + '\n\nEscribe el número:');
-  if (!choice) return;
-  const num = parseInt(choice) - 1;
-  if (isNaN(num) || num < 0 || num >= otherCols.length) { alert('Número inválido'); return; }
-  const target = otherCols[num];
-  if (!target.products) target.products = [];
-  target.products.push(p);
-  col.products.splice(idx, 1);
-  markDirty();
-  renderGrid(); renderAdminList();
-  showStatus('"' + p.name + '" movido a "' + target.name + '". Presiona "Publicar".', '');
 }
 
 function deleteProd(idx) {
