@@ -336,39 +336,39 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
 
 <nav>
 <img src="logojasy.png" id="navLogo" alt="JASY"> JASY
-  <ul class="nav-links">
-    <li><a href="#catalogo">Catálogo</a></li>
-    <li><a href="#info">Info</a></li>
-    <li><a href="https://wa.me/573042634755" target="_blank">WhatsApp</a></li>
-  </ul>
-  <div style="display:flex;align-items:center;gap:.6rem">
-    <button class="search-toggle" id="searchToggle" onclick="toggleSearch()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    </button>
-    <button class="cart-btn" onclick="toggleCart()">Carrito <span class="cart-count" id="cartCount">0</span></button>
-  </div>
-</nav>
+  < ul  class = "nav-links" >
+    < li > < a  href = "#catalogo" > Catálogo </ a > </ li >
+    <li> <a href="#info"> Información </a> </li>​​​ ​​​​​​​​
+    <li> <a href="https://wa.me/573042634755" target="_blank"> WhatsApp </a> </li>​​​​​​​​​​​​​​  
+  </ul>​​
+  < div  style = " display : flex ; align - items : center ; gap : .6rem " >
+    < button  class = "search-toggle"  id = "searchToggle"  onclick = " toggleSearch ( ) " >
+      < svg  viewBox = "0 0 24 24"  fill = "none"  stroke = "currentColor"  stroke-width = "2" > < circle  cx = "11"  cy = " 11 "  r = "8" /> < line  x1 = "21"  y1 = "21"  x2 = "16.65"  y2 = "16.65" / > </svg>
+    </ botón >
+    < button  class = " cart - btn"  onclick = " toggleCart ( ) " > Carrito < span  class = "cart - count " id = " cartCount  " > 0 </span> </button>
+  </div>​​
+</nav>​​
 
-<!-- Search dropdown -->
-<div class="search-bar" id="searchBar">
-  <input type="text" class="search-input" id="searchInput" placeholder="Buscar producto..." oninput="handleSearch()">
-  <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
-</div>
+<!-- Menú desplegable de búsqueda -->
+< div  class = "search-bar"  id = "searchBar" >
+  < input  type = "text"  class = "search-input"  id = "searchInput"  placeholder = "Buscar producto..."  oninput = "handleSearch()" >
+  < button  class = "search - clear"  id = "searchClear  " onclick = " clearSearch ( ) " > ✕ </button>
+</div>​​
 
-<section class="hero">
-  <div class="hero-bg" id="heroBg"></div>
-  <span class="hero-eye" id="heroEye"></span>
-  <h1 class="hero-title" id="heroTitle"></h1>
-  <p class="hero-sub" id="heroSub"></p>
-  <a href="#catalogo" class="hero-cta" id="heroCta"></a>
-</section>
+< section  class = "hero" >
+  < div  class = "hero-bg"  id = "heroBg" > </ div >
+  < span  class = "hero - eye " id = " heroEye  " > </span>
+  < h1  class = "hero-title"  id = "heroTitle" > </ h1 >
+  < p  class = " hero - sub" id = " heroSub "  > </p>
+  <a href="#catalogo" class="hero-cta" id="heroCta"> </a> ​​​ ​​​ ​​​​​​​
+</ sección >
 
-<section id="catalogo">
-  <div class="cat-header">
-    <div class="section-label">Prendas disponibles</div>
-    <h2>Nuestras Colecciones</h2>
-  </div>
-  <div class="tabs" id="tabs"></div>
+< section  id = "catálogo" >
+  < div  class = "cat-header" >
+    < div  class = "section-label" > Prendas disponibles </ div >
+    < h2 > Nuestras Colecciones </ h2 >
+  </div>​​
+  < div  class = "tabs"  id = " tabs " > </div>
   <div id="pgrid"><div class="loading-cat">Cargando catálogo…</div></div>
 </section>
 
