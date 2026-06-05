@@ -18,7 +18,6 @@
 <meta property="og:site_name" content="JASY Boutique">
 <meta property="og:image" content="https://raw.githubusercontent.com/edutinpedagogia06-dot/JASYJOE/main/logojasy.png">
 <meta property="og:locale" content="es_CO">
-  <link rel="icon" type="image/png" href="logojasy.png">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
@@ -335,40 +334,40 @@ footer img{height:38px;opacity:.7;filter:brightness(1.2)}
 <div class="notice" id="noticeBar"></div>
 
 <nav>
-<img src="logojasy.png" id="navLogo" alt="JASY"> JASY
-  < ul  class = "nav-links" >
-    < li > < a  href = "#catalogo" > Catálogo </ a > </ li >
-    <li> <a href="#info"> Información </a> </li>​​​ ​​​​​​​​
-    <li> <a href="https://wa.me/573042634755" target="_blank"> WhatsApp </a> </li>​​​​​​​​​​​​​​  
-  </ul>​​
-  < div  style = " display : flex ; align - items : center ; gap : .6rem " >
-    < button  class = "search-toggle"  id = "searchToggle"  onclick = " toggleSearch ( ) " >
-      < svg  viewBox = "0 0 24 24"  fill = "none"  stroke = "currentColor"  stroke-width = "2" > < circle  cx = "11"  cy = " 11 "  r = "8" /> < line  x1 = "21"  y1 = "21"  x2 = "16.65"  y2 = "16.65" / > </svg>
-    </ botón >
-    < button  class = " cart - btn"  onclick = " toggleCart ( ) " > Carrito < span  class = "cart - count " id = " cartCount  " > 0 </span> </button>
-  </div>​​
-</nav>​​
+  <a href="#" class="nav-logo"><img src="" id="navLogo" alt="JASY"></a>
+  <ul class="nav-links">
+    <li><a href="#catalogo">Catálogo</a></li>
+    <li><a href="#info">Info</a></li>
+    <li><a href="https://wa.me/573042634755" target="_blank">WhatsApp</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:.6rem">
+    <button class="search-toggle" id="searchToggle" onclick="toggleSearch()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+    <button class="cart-btn" onclick="toggleCart()">Carrito <span class="cart-count" id="cartCount">0</span></button>
+  </div>
+</nav>
 
-<!-- Menú desplegable de búsqueda -->
-< div  class = "search-bar"  id = "searchBar" >
-  < input  type = "text"  class = "search-input"  id = "searchInput"  placeholder = "Buscar producto..."  oninput = "handleSearch()" >
-  < button  class = "search - clear"  id = "searchClear  " onclick = " clearSearch ( ) " > ✕ </button>
-</div>​​
+<!-- Search dropdown -->
+<div class="search-bar" id="searchBar">
+  <input type="text" class="search-input" id="searchInput" placeholder="Buscar producto..." oninput="handleSearch()">
+  <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+</div>
 
-< section  class = "hero" >
-  < div  class = "hero-bg"  id = "heroBg" > </ div >
-  < span  class = "hero - eye " id = " heroEye  " > </span>
-  < h1  class = "hero-title"  id = "heroTitle" > </ h1 >
-  < p  class = " hero - sub" id = " heroSub "  > </p>
-  <a href="#catalogo" class="hero-cta" id="heroCta"> </a> ​​​ ​​​ ​​​​​​​
-</ sección >
+<section class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <span class="hero-eye" id="heroEye"></span>
+  <h1 class="hero-title" id="heroTitle"></h1>
+  <p class="hero-sub" id="heroSub"></p>
+  <a href="#catalogo" class="hero-cta" id="heroCta"></a>
+</section>
 
-< section  id = "catálogo" >
-  < div  class = "cat-header" >
-    < div  class = "section-label" > Prendas disponibles </ div >
-    < h2 > Nuestras Colecciones </ h2 >
-  </div>​​
-  < div  class = "tabs"  id = " tabs " > </div>
+<section id="catalogo">
+  <div class="cat-header">
+    <div class="section-label">Prendas disponibles</div>
+    <h2>Nuestras Colecciones</h2>
+  </div>
+  <div class="tabs" id="tabs"></div>
   <div id="pgrid"><div class="loading-cat">Cargando catálogo…</div></div>
 </section>
 
